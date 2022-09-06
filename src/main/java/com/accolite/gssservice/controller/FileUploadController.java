@@ -64,6 +64,7 @@ public class FileUploadController {
 		} catch (Exception e) {
 			log.error("Exception occurred :: ", e);
 			e.printStackTrace();
+			@SuppressWarnings("deprecation")
 			String errorMsg = !StringUtils.isEmpty(e.getMessage()) ? e.getMessage()
 					: "Some Thing went wrong! Try after Sometime";
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMsg);
