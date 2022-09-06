@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,12 +27,8 @@ public class FileUploadController {
 	public ResponseEntity<?> uploadFile(@RequestParam("file1") MultipartFile file,
 			@RequestParam("file2") MultipartFile file2) {
 
-//		System.out.println(file.getOriginalFilename());
-//		System.out.println(file.getSize()); 
-		System.out.println(file.getContentType());
-//		System.out.println(file.getName());
-
 		try {
+			log.info("content-type :: {}, {}", file.getContentType(), file.getContentType());
 
 			if (file.isEmpty()) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File is Empty");
@@ -64,14 +61,13 @@ public class FileUploadController {
 			header.setContentLength(bytes.length);
 
 			return ResponseEntity.ok().headers(header).body(bytes);
-
 		} catch (Exception e) {
 			log.error("Exception occurred :: ", e);
 			e.printStackTrace();
+			String errorMsg = !StringUtils.isEmpty(e.getMessage()) ? e.getMessage()
+					: "Some Thing went wrong! Try after Sometime";
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMsg);
 		}
-
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body("Some Thing went wrong! Try after Sometime");
 	}
 
 }
