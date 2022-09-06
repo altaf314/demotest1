@@ -57,7 +57,7 @@ public class CompareSheetUtil {
 		}
 	}
 
-	public static void compareTwoSheets(XSSFSheet sheet1, XSSFSheet sheet2, Map<String, String> differences)
+	private static void compareTwoSheets(XSSFSheet sheet1, XSSFSheet sheet2, Map<String, String> differences)
 			throws Exception {
 		int rows = sheet1.getPhysicalNumberOfRows();
 		int columns = sheet1.getRow(0).getLastCellNum();
@@ -84,7 +84,7 @@ public class CompareSheetUtil {
 		}
 	}
 
-	public static String getValue(int x, int y, XSSFSheet sheet) {
+	private static String getValue(int x, int y, XSSFSheet sheet) {
 		Row row = sheet.getRow(y);
 		if (row == null)
 			return "";
@@ -94,7 +94,7 @@ public class CompareSheetUtil {
 		return getCellValue(cell);
 	}
 
-	public static String getCellValue(Cell cell) {
+	private static String getCellValue(Cell cell) {
 		switch (cell.getCellType()) {
 		case NUMERIC:
 			return cell.getNumericCellValue() + "";
@@ -113,7 +113,7 @@ public class CompareSheetUtil {
 		}
 	}
 
-	public static void readSheet(Sheet sheet) {
+	private static void readSheet(Sheet sheet) {
 		Iterator<Row> rows = sheet.iterator();
 
 		while (rows.hasNext()) {
@@ -124,7 +124,6 @@ public class CompareSheetUtil {
 				Cell cell = cells.next();
 				log.info(getCellValue(cell));
 			}
-
 		}
 	}
 
