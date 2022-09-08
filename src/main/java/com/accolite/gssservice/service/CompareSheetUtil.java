@@ -8,8 +8,8 @@ import java.util.Objects;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -25,6 +25,7 @@ public class CompareSheetUtil {
 		XSSFWorkbook workbook2 = new XSSFWorkbook(file2.getInputStream());
 
 		Map<String, String> differences = new HashMap<>();
+
 		if (Objects.nonNull(workbook) && Objects.nonNull(workbook2)) {
 			compareTwoSheets(workbook.getSheetAt(0), workbook2.getSheetAt(0), differences);
 		}
@@ -59,28 +60,34 @@ public class CompareSheetUtil {
 
 	private static void compareTwoSheets(XSSFSheet sheet1, XSSFSheet sheet2, Map<String, String> differences)
 			throws Exception {
-		int rows = sheet1.getPhysicalNumberOfRows();
-		int columns = sheet1.getRow(0).getLastCellNum();
-		if (sheet2.getPhysicalNumberOfRows() > rows) {
-			rows = sheet2.getPhysicalNumberOfRows();
-		}
-		if (sheet2.getRow(0).getLastCellNum() > columns) {
-			columns = sheet2.getRow(0).getLastCellNum();
-		}
 
-		for (int i = 0; i <= rows; i++) {
-			XSSFRow row = sheet1.getRow(i);
-			if (Objects.nonNull(row)) {
-				for (int j = 0; j <= columns; j++) {
-					String data = getValue(i, j, sheet1);
-					String data2 = getValue(i, j, sheet2);
-					if (!data.equals(data2)) {
-						log.info("DIFFERENCE");
-						differences.put(new StringBuilder().append(i).append(":").append(j).toString(),
-								new StringBuilder().append(data).append(" -> ").append(data2).toString());
+		if (isSheetBlank(sheet1) && isSheetBlank(sheet2)) {
+			int rows = sheet1.getPhysicalNumberOfRows();
+			int columns = sheet1.getRow(0).getLastCellNum();
+			if (sheet2.getPhysicalNumberOfRows() > rows) {
+				rows = sheet2.getPhysicalNumberOfRows();
+			}
+			if (sheet2.getRow(0).getLastCellNum() > columns) {
+				columns = sheet2.getRow(0).getLastCellNum();
+			}
+
+			for (int i = 0; i <= rows; i++) {
+				XSSFRow row = sheet1.getRow(i);
+				if (Objects.nonNull(row)) {
+					for (int j = 0; j <= columns; j++) {
+						String data = getValue(i, j, sheet1);
+						String data2 = getValue(i, j, sheet2);
+						if (!data.equals(data2)) {
+							log.info("DIFFERENCE");
+							differences.put(new StringBuilder().append(i).append(":").append(j).toString(),
+									new StringBuilder().append(data).append(" -> ").append(data2).toString());
+						}
 					}
 				}
 			}
+
+		} else {
+			throw new Exception("Sheet is Blank");
 		}
 	}
 
@@ -113,18 +120,20 @@ public class CompareSheetUtil {
 		}
 	}
 
-	private static void readSheet(Sheet sheet) {
-		Iterator<Row> rows = sheet.iterator();
-
+	public static boolean isSheetBlank(XSSFSheet sheet) {
+		Iterator rows = sheet.rowIterator();
 		while (rows.hasNext()) {
-			Row row = rows.next();
-			Iterator<Cell> cells = row.iterator();
-
+			XSSFRow row = (XSSFRow) rows.next();
+			Iterator cells = row.cellIterator();
 			while (cells.hasNext()) {
-				Cell cell = cells.next();
-				log.info(getCellValue(cell));
+				XSSFCell cell = (XSSFCell) cells.next();
+				if (!cell.getStringCellValue().isEmpty()) {
+					return true;
+				}
 			}
 		}
+		return false;
+
 	}
 
 }

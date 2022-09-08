@@ -28,7 +28,7 @@ public class FileUploadController {
 			@RequestParam("file2") MultipartFile file2) {
 
 		try {
-			log.info("content-type :: {}, {}", file.getContentType(), file.getContentType());
+			log.info("content-type :: {}, {}", file.getContentType(), file2.getContentType());
 
 			if (file.isEmpty()) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File is Empty");
